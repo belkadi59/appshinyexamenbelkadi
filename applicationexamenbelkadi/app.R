@@ -44,7 +44,17 @@ ui <- fluidPage(
 
 # SERVER
 server <- function(input, output) {
-
+    observeEvent(input$boutton, {
+      showNotification(
+        paste("prix : ",input$prix , " & color : ",input$couleur),
+        type = "message"
+      )
+    })
+  
+    output$info <- renderText({
+      paste("prix : ",input$prix , " & color : ",input$couleur)
+    })
+    
     output$distPlot <- renderPlot({
         
     })
