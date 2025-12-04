@@ -8,7 +8,12 @@ library(bslib)
 
 # UI
 ui <- fluidPage(
-
+    # Theme de l’application
+    theme = bs_theme(
+      version = 5,
+      bootswatch = "minty"
+    ),
+    
     # Application title
     titlePanel("Exploration des Diamants"),
     
