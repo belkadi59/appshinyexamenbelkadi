@@ -17,8 +17,8 @@ ui <- fluidPage(
         sidebarPanel(
           
             radioButtons(inputId="rose", label = "Colorier les points en rose ?",
-                       choices = list("Oui" = 1, "Non" = 2), 
-                       selected = 1),
+                       choices = list("Oui" = "pink", "Non" = "black"), 
+                       selected = "pink"),
             
             selectInput(inputId="couleur", label = "Choisir une couleur à filtrer :", 
                         choices = list("D" = "D", "E"="E", "F"="F", "G"="G", "H"="H", "I"="I", "J"="J"), 
@@ -56,7 +56,10 @@ server <- function(input, output) {
     })
     
     output$diamondsplot <- renderPlot({
-        
+      diamonds |> 
+        filter(price > input$prix & color == input$couleur)|>
+        ggplot(aes(x=carat, y=price)) + 
+        geom_point(color = input$rose)
     })
     
     output$tableau <- DT::renderDT({
