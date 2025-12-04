@@ -5,7 +5,7 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 library(bslib)
-
+thematic::thematic_shiny(font = "auto")
 # UI
 ui <- fluidPage(
     # Theme de l’application
@@ -41,7 +41,7 @@ ui <- fluidPage(
         # Show a plot of the generated distribution
         mainPanel(
           textOutput(outputId = "info"),
-          plotOutput(outputId = "diamondsplot"),
+          plotly::plotlyOutput(outputId = "diamondsplot"),
           DT::DTOutput(outputId = "tableau")
         )
     )
@@ -60,13 +60,14 @@ server <- function(input, output) {
       paste("prix : ",input$prix , " & color : ",input$couleur)
     })
     
-    output$diamondsplot <- renderPlot({
-      diamonds |> 
+    output$diamondsplot <- plotly::renderPlotly({
+      legraph <- diamonds |> 
         filter(price > input$prix & color == input$couleur)|>
         ggplot(aes(x=carat, y=price)) + 
         geom_point(color = input$rose)
+      plotly::ggplotly(legraph)
     })
-    
+
     output$tableau <- DT::renderDT({
       diamonds |> 
         select(-c(x, y, z)) |>
