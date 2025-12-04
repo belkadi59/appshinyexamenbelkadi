@@ -40,7 +40,6 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
-          textOutput(outputId = "info"),
           plotly::plotlyOutput(outputId = "diamondsplot"),
           DT::DTOutput(outputId = "tableau")
         )
@@ -56,15 +55,14 @@ server <- function(input, output) {
       )
     })
   
-    output$info <- renderText({
-      paste("prix : ",input$prix , " & color : ",input$couleur)
-    })
-    
     output$diamondsplot <- plotly::renderPlotly({
       legraph <- diamonds |> 
         filter(price > input$prix & color == input$couleur)|>
         ggplot(aes(x=carat, y=price)) + 
-        geom_point(color = input$rose)
+        geom_point(color = input$rose)+
+        labs(
+          title = paste("prix : ",input$prix , " & color : ",input$couleur)
+        )
       plotly::ggplotly(legraph)
     })
 
