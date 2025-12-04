@@ -36,7 +36,7 @@ ui <- fluidPage(
         # Show a plot of the generated distribution
         mainPanel(
           textOutput(outputId = "info"),
-          plotOutput("distPlot"),
+          plotOutput(outputId = "diamondsplot"),
           DT::DTOutput(outputId = "tableau")
         )
     )
@@ -55,8 +55,14 @@ server <- function(input, output) {
       paste("prix : ",input$prix , " & color : ",input$couleur)
     })
     
-    output$distPlot <- renderPlot({
+    output$diamondsplot <- renderPlot({
         
+    })
+    
+    output$tableau <- DT::renderDT({
+      diamonds |> 
+        select(-c(x, y, z)) |>
+        filter(price > input$prix & color == input$couleur)
     })
 }
 
