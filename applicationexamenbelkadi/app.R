@@ -1,28 +1,36 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    https://shiny.posit.co/
-#
+# Mon application Shiny pour l'examen
 
+# Liste des librairies
 library(shiny)
+library(dplyr)
+library(ggplot2)
+library(bslib)
 
-# Define UI for application that draws a histogram
+# UI
 ui <- fluidPage(
 
     # Application title
     titlePanel("Exploration des Diamants"),
-
+    
     # Sidebar with a slider input for number of bins 
     sidebarLayout(
         sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+          
+            radioButtons("rose", label = "Colorier les points en rose ?",
+                       choices = list("Oui" = 1, "Non" = 2), 
+                       selected = 1),
+            
+            selectInput("couleur", label = "Choisir une couleur à filtrer :", 
+                        choices = list("D" = "D", "E"="E", "F"="F", "G"="G", "H"="H", "I"="I", "J"="J"), 
+                        selected = "D"),
+            
+            sliderInput(inputId ="bins",
+                        label="Prix maximum :",
+                        min = 300,
+                        max = 20000,
+                        value = 30),
+            
+            actionButton(inputId = "boutton", label = "Visualiser le graph")
         ),
 
         # Show a plot of the generated distribution
@@ -32,7 +40,7 @@ ui <- fluidPage(
     )
 )
 
-# Define server logic required to draw a histogram
+# SERVER
 server <- function(input, output) {
 
     output$distPlot <- renderPlot({
