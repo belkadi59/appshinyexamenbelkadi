@@ -6,6 +6,7 @@ library(dplyr)
 library(ggplot2)
 library(bslib)
 thematic::thematic_shiny(font = "auto")
+
 # UI
 ui <- fluidPage(
     # Theme de l’application
@@ -38,7 +39,6 @@ ui <- fluidPage(
             actionButton(inputId = "boutton", label = "Visualiser le graph")
         ),
 
-        # Show a plot of the generated distribution
         mainPanel(
           plotly::plotlyOutput(outputId = "diamondsplot"),
           DT::DTOutput(outputId = "tableau")
@@ -48,28 +48,46 @@ ui <- fluidPage(
 
 # SERVER
 server <- function(input, output) {
+  
+    #Pour contenir les résultats filtrés
+    rv <- reactiveValues(df = NULL, 
+                         prix_diamonds = NULL,
+                         couleur_diamonds = NULL,
+                         color_point = NULL) 
+    
     observeEvent(input$boutton, {
+      
+      # On enregistre les valeurs au moment du clic
+      rv$prix_diamonds <- input$prix
+      rv$couleur_diamonds <- input$couleur
+      rv$color_point <- input$rose
+      
       showNotification(
-        paste("prix : ",input$prix , " & color : ",input$couleur),
+        paste("prix : ",rv$prix_diamonds , " & color : ",rv$couleur_diamonds),
         type = "message"
       )
+      # On filtre une seule fois
+      rv$df <- diamonds |>
+        filter(price > rv$prix_diamonds & color == rv$couleur_diamonds)
     })
   
+    # Graphique
     output$diamondsplot <- plotly::renderPlotly({
-      legraph <- diamonds |> 
-        filter(price > input$prix & color == input$couleur)|>
+      req(rv$df)   # empêche l’affichage au démarrage
+      legraph <- rv$df |> 
         ggplot(aes(x=carat, y=price)) + 
-        geom_point(color = input$rose)+
+        geom_point(color = rv$color_point)+
         labs(
-          title = paste("prix : ",input$prix , " & color : ",input$couleur)
+          title = paste("prix : ",rv$prix_diamonds , " & color : ",rv$couleur_diamonds)
         )
       plotly::ggplotly(legraph)
     })
 
+    # Tableau
     output$tableau <- DT::renderDT({
-      diamonds |> 
-        select(-c(x, y, z)) |>
-        filter(price > input$prix & color == input$couleur)
+      req(rv$df)
+      rv$df |> 
+        select(-c(x, y, z))
     })
 }
 
